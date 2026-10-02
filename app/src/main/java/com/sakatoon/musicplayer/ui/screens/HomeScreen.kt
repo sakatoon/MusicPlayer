@@ -51,6 +51,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     val visibleSongs = filterSongs(uiState.songs, searchQuery)
 
     Column(
@@ -75,8 +76,20 @@ fun HomeScreen(
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(32.dp)
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                if (uiState.songs.isNotEmpty()) {
+                    IconButton(
+                        onClick = { isSearchVisible = !isSearchVisible },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = if (isSearchVisible) "Ocultar búsqueda" else "Buscar canciones"
+                        )
+                    }
+                }
             }
-            if (uiState.songs.isNotEmpty()) {
+            if (uiState.songs.isNotEmpty() && (isSearchVisible || searchQuery.isNotEmpty())) {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
