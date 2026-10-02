@@ -1,0 +1,15 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <bitmap
+            android:alpha="0.72"
+            android:gravity="fill"
+            android:src="@drawable/widget_music_background" />
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#73121212" />
+            <corners android:radius="20dp" />
+            <stroke android:width="1dp" android:color="#4D03BDE8" />
+        </shape>
+    </item>
+</layer-list>

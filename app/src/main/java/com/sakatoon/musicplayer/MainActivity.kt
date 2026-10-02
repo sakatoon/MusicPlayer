@@ -52,8 +52,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             MusicPlayerTheme {
                 val windowSize = calculateWindowSizeClass(this)
-                MainScreen(windowSize = windowSize.widthSizeClass, viewModel = viewModel)
+                MainScreen(
+                    windowSize = windowSize.widthSizeClass,
+                    viewModel = viewModel,
+                    startDestination = intent.getStringExtra(EXTRA_DESTINATION) ?: Screen.Home.route
+                )
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_DESTINATION = "com.sakatoon.musicplayer.DESTINATION"
     }
 }

@@ -37,6 +37,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.SupervisorJob
 import com.sakatoon.musicplayer.MusicApplication
+import com.sakatoon.musicplayer.widget.MusicWidgetUpdater
+import com.sakatoon.musicplayer.audio.AudioEqualizer
 
 @OptIn(UnstableApi::class)
 class MusicService : MediaLibraryService() {
@@ -70,6 +72,16 @@ class MusicService : MediaLibraryService() {
         mediaSession = MediaLibrarySession.Builder(this, player, LibrarySessionCallback())
             .setSessionActivity(sessionActivityPendingIntent)
             .build()
+        player.addListener(object : Player.Listener {
+            override fun onEvents(player: Player, events: Player.Events) {
+                MusicWidgetUpdater.updatePlaybackWidgets(this@MusicService, player)
+            }
+
+            override fun onAudioSessionIdChanged(audioSessionId: Int) {
+                AudioEqualizer.attach(this@MusicService, audioSessionId)
+            }
+        })
+        AudioEqualizer.attach(this, player.audioSessionId)
         val repository = (application as MusicApplication).container.musicRepository
         scope.launch {
             repository.allSongs.collect { songs ->
@@ -344,6 +356,7 @@ class MusicService : MediaLibraryService() {
 
 
     override fun onDestroy() {
+        AudioEqualizer.release()
         mediaSession?.run {
             player.release()
             release()

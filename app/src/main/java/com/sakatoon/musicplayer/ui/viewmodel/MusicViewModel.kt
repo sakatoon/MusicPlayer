@@ -32,6 +32,9 @@ import com.sakatoon.musicplayer.data.repository.UserPreferencesRepository
 
 import com.sakatoon.musicplayer.service.MusicService
 import com.sakatoon.musicplayer.service.MediaIdResolver
+import com.sakatoon.musicplayer.widget.PlayButtonAction
+import com.sakatoon.musicplayer.widget.playButtonAction
+import com.sakatoon.musicplayer.widget.randomSongIndex
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +47,7 @@ data class MusicUiState(
     val songs: List<Song> = emptyList(),
     val currentSong: Song? = null,
     val isPlaying: Boolean = false,
+    val isShuffleEnabled: Boolean = false,
     val progress: Float = 0f,
     val currentPosition: Long = 0L,
     val duration: Long = 0L,
@@ -51,6 +55,7 @@ data class MusicUiState(
 
     val folderUris: Set<String> = emptySet(),
     val folderNames: List<String> = emptyList(),
+    val folderSongCounts: Map<String, Int> = emptyMap(),
     val isScanning: Boolean = false
 )
 
@@ -76,7 +81,10 @@ class MusicViewModel(
                 player = mediaControllerFuture?.get()
                 setupPlayerListener()
                 updateCurrentSong(player?.currentMediaItem)
-                _uiState.value = _uiState.value.copy(isPlaying = player?.isPlaying == true)
+                player?.shuffleModeEnabled = _uiState.value.isShuffleEnabled
+                _uiState.value = _uiState.value.copy(
+                    isPlaying = player?.isPlaying == true
+                )
                 viewModelScope.launch {
                     while (true) {
                         updateProgress()
@@ -90,6 +98,13 @@ class MusicViewModel(
             }
         }, MoreExecutors.directExecutor())
 
+
+        viewModelScope.launch {
+            userPreferencesRepository.shuffleEnabled.collectLatest { enabled ->
+                _uiState.value = _uiState.value.copy(isShuffleEnabled = enabled)
+                player?.shuffleModeEnabled = enabled
+            }
+        }
 
         viewModelScope.launch {
             userPreferencesRepository.musicFolderUris.collectLatest { uris ->
@@ -112,6 +127,12 @@ class MusicViewModel(
                 _favoriteIds.value = favorites.map { it.songId }.toSet()
             }
         }
+
+        viewModelScope.launch {
+            musicRepository.folderSongCounts.collectLatest { counts ->
+                _uiState.value = _uiState.value.copy(folderSongCounts = counts)
+            }
+        }
     }
 
     private fun setupPlayerListener() {
@@ -122,6 +143,15 @@ class MusicViewModel(
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 _uiState.value = _uiState.value.copy(isPlaying = isPlaying)
+            }
+
+            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+                if (_uiState.value.isShuffleEnabled != shuffleModeEnabled) {
+                    _uiState.value = _uiState.value.copy(isShuffleEnabled = shuffleModeEnabled)
+                    viewModelScope.launch {
+                        userPreferencesRepository.setShuffleEnabled(shuffleModeEnabled)
+                    }
+                }
             }
             
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -169,10 +199,25 @@ class MusicViewModel(
     }
 
     fun togglePlayPause() {
-        if (player?.isPlaying == true) {
-            player?.pause()
-        } else {
-            player?.play()
+        val activePlayer = player
+        if (activePlayer == null) {
+            Toast.makeText(context, "El reproductor todavía no está listo", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val hasCurrentSong = activePlayer.currentMediaItem != null &&
+            activePlayer.playbackState != Player.STATE_ENDED
+        when (playButtonAction(activePlayer.isPlaying, hasCurrentSong)) {
+            PlayButtonAction.PAUSE -> activePlayer.pause()
+            PlayButtonAction.RESUME -> activePlayer.play()
+            PlayButtonAction.PLAY_RANDOM -> {
+                val songs = _uiState.value.songs
+                val selectedIndex = randomSongIndex(songs.size, currentIndex = -1)
+                if (selectedIndex == null) {
+                    Toast.makeText(context, "No hay canciones en la biblioteca", Toast.LENGTH_SHORT).show()
+                } else {
+                    playSong(songs[selectedIndex])
+                }
+            }
         }
     }
 
@@ -191,6 +236,15 @@ class MusicViewModel(
 
     fun skipPrevious() {
         player?.seekToPrevious()
+    }
+
+    fun toggleShuffle() {
+        val enabled = !_uiState.value.isShuffleEnabled
+        _uiState.value = _uiState.value.copy(isShuffleEnabled = enabled)
+        player?.shuffleModeEnabled = enabled
+        viewModelScope.launch {
+            userPreferencesRepository.setShuffleEnabled(enabled)
+        }
     }
 
     fun addMusicFolder(uri: Uri) {

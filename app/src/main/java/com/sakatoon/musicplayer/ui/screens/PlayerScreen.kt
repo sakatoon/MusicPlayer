@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,6 +35,7 @@ fun PlayerScreen(
     val favoriteIds by viewModel.favoriteIds.collectAsState()
     val playlists by viewModel.allPlaylists.collectAsState(initial = emptyList())
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
 
     BoxWithConstraints(
@@ -51,13 +53,18 @@ fun PlayerScreen(
 
         // Album Art
         coil.compose.AsyncImage(
-            model = uiState.currentSong?.albumArtUri,
-            contentDescription = "Album Art",
+            model = com.sakatoon.musicplayer.ui.components.resolveArtworkModel(
+                uiState.currentSong?.albumArtUri,
+                com.sakatoon.musicplayer.R.drawable.sakatoon_mp
+            ),
+            contentDescription = "Portada de la canción",
             contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             modifier = Modifier
                 .size(artworkSize)
                 .background(Color.DarkGray),
-            error = null
+            placeholder = androidx.compose.ui.res.painterResource(com.sakatoon.musicplayer.R.drawable.sakatoon_mp),
+            error = androidx.compose.ui.res.painterResource(com.sakatoon.musicplayer.R.drawable.sakatoon_mp),
+            fallback = androidx.compose.ui.res.painterResource(com.sakatoon.musicplayer.R.drawable.sakatoon_mp)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -136,29 +143,59 @@ fun PlayerScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+             FilledTonalIconButton(
+                onClick = {
+                    val enabling = !uiState.isShuffleEnabled
+                    viewModel.toggleShuffle()
+                    android.widget.Toast.makeText(
+                        context,
+                        if (enabling) "Reproducción aleatoria activada" else "Reproducción aleatoria desactivada",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                },
+                modifier = Modifier.size(60.dp),
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = if (uiState.isShuffleEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (uiState.isShuffleEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+             ) {
+                Icon(
+                    Icons.Default.Shuffle,
+                    contentDescription = if (uiState.isShuffleEnabled) {
+                        "Desactivar reproducción aleatoria"
+                    } else {
+                        "Activar reproducción aleatoria"
+                    },
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+
              val isFavorite = uiState.currentSong?.let { favoriteIds.contains(it.id) } ?: false
              
-             IconButton(onClick = { uiState.currentSong?.let { viewModel.toggleFavorite(it) } }) {
+             FilledTonalIconButton(
+                onClick = { uiState.currentSong?.let { viewModel.toggleFavorite(it) } },
+                modifier = Modifier.size(60.dp)
+             ) {
                 Icon(
                     if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Favorito",
-                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface 
+                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(30.dp)
                 )
             }
             
             // Add to Playlist Button
-            IconButton(onClick = { 
+            FilledTonalIconButton(onClick = {
                 // Show dialog
                 showAddToPlaylistDialog = true 
-            }) {
-                Icon(Icons.Default.PlaylistAdd, contentDescription = "Agregar a Playlist", tint = MaterialTheme.colorScheme.onSurface)
+            }, modifier = Modifier.size(60.dp)) {
+                Icon(Icons.Default.PlaylistAdd, contentDescription = "Agregar a Playlist", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(30.dp))
             }
         }
     }
     }
     
     if (showAddToPlaylistDialog) {
-        val context = androidx.compose.ui.platform.LocalContext.current
         com.sakatoon.musicplayer.ui.components.AddToPlaylistDialog(
             playlists = playlists,
             onPlaylistSelected = { playlist ->

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
+    <string name="widget_compact_description">Controles compactos de música</string>
+    <string name="widget_now_playing_description">Portada y controles de la canción actual</string>
+    <string name="widget_shortcuts_description">Accesos rápidos a tu música</string>
+    <string name="widget_app_logo">Icono de MusicPlayer</string>
+    <string name="widget_music_image">Ilustración musical</string>
+    <string name="widget_album_art">Portada de la canción</string>
+    <string name="widget_previous">Canción anterior</string>
+    <string name="widget_play_pause">Reproducir o pausar</string>
+    <string name="widget_next">Canción siguiente</string>
+    <string name="widget_now_playing">Ahora suena</string>
+    <string name="widget_library">Biblioteca</string>
+    <string name="widget_favorites">Favoritos</string>
+    <string name="widget_playlists">Listas</string>
 </resources>

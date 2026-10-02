@@ -13,11 +13,12 @@ import com.sakatoon.musicplayer.ui.viewmodel.MusicViewModel
 fun MusicNavHost(
     navController: NavHostController,
     viewModel: MusicViewModel,
+    startDestination: String = Screen.Home.route,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         composable(Screen.Home.route) {
@@ -51,9 +52,14 @@ fun MusicNavHost(
             FavoritesScreen(viewModel = viewModel)
         }
 
+        composable(Screen.Equalizer.route) {
+            EqualizerScreen()
+        }
+
         composable(Screen.Settings.route) {
             SettingsScreen(
                 viewModel = viewModel,
+                onEqualizerClick = { navController.navigate(Screen.Equalizer.route) },
 
                 onFolderSelected = {
                     // Navigate back to Home/Library and clear stack up to Home to avoid back loops

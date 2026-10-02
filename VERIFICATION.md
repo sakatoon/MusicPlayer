@@ -33,5 +33,6 @@ No se borró ni se sembró la biblioteca del teléfono. Las pruebas consultan el
 - Las correcciones de navegación, correo y escaneo requieren más pruebas de interacción y de fallos de proveedores de documentos.
 - Persisten advertencias de Lint, principalmente mantenimiento de dependencias, recursos y recomendaciones de API/estilo. No se realizó una auditoría exhaustiva de seguridad o de vulnerabilidades de dependencias.
 - No se validaron bibliotecas masivas, colisiones de identificadores derivados de URI, recuperación de portadas de caché ni interrupciones durante la reconciliación de la base de datos.
+- Los tres widgets compilan y sus proveedores se comprueban mediante una prueba instrumentada. En la última revisión no había un teléfono conectado para ejecutar de nuevo esa prueba ni verificar visualmente los widgets en un launcher real.
 
 Estos resultados describen el alcance real de la revisión; no certifican ausencia de todos los errores ni aprobación de Google Play/Android Auto.

@@ -17,7 +17,8 @@ import com.sakatoon.musicplayer.ui.viewmodel.MusicViewModel
 @Composable
 fun MainScreen(
     windowSize: WindowWidthSizeClass,
-    viewModel: MusicViewModel
+    viewModel: MusicViewModel,
+    startDestination: String = com.sakatoon.musicplayer.ui.navigation.Screen.Home.route
 ) {
     val navController = rememberNavController()
 
@@ -30,6 +31,7 @@ fun MainScreen(
             MusicNavHost(
                 navController = navController,
                 viewModel = viewModel,
+                startDestination = startDestination,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -41,6 +43,7 @@ fun MainScreen(
             MusicNavHost(
                 navController = navController,
                 viewModel = viewModel,
+                startDestination = startDestination,
                 modifier = Modifier.weight(1f)
             )
         }

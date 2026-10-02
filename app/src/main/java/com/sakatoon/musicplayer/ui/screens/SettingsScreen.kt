@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +44,7 @@ import com.sakatoon.musicplayer.ui.viewmodel.MusicViewModel
 
 fun SettingsScreen(
     viewModel: MusicViewModel,
+    onEqualizerClick: () -> Unit,
     onFolderSelected: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -168,12 +170,19 @@ fun SettingsScreen(
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = name,
-                        modifier = Modifier.weight(1f),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 16.sp
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = name,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = folderSongCountText(uiState.folderSongCounts[uriStr], uiState.isScanning),
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 12.sp
+                        )
+                    }
                     androidx.compose.material3.IconButton(
                         onClick = { viewModel.removeMusicFolder(uriStr) }
                     ) {
@@ -213,8 +222,44 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.material3.Icon(
+                    Icons.Default.GraphicEq,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(32.dp)
+                )
+                Column(Modifier.padding(horizontal = 14.dp).weight(1f)) {
+                    Text("Ecualizador de audio", fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    Text(
+                        "Bandas, perfiles y ajuste personalizado",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp
+                    )
+                }
+                Button(onClick = onEqualizerClick) { Text("Abrir") }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         DeveloperInformation()
     }
+}
+
+fun folderSongCountText(count: Int?, isScanning: Boolean): String = when {
+    isScanning -> "Escaneando…"
+    count == null -> "Pendiente de escaneo"
+    count == 1 -> "1 canción encontrada"
+    else -> "$count canciones encontradas"
 }
 
 @Composable

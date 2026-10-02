@@ -13,6 +13,9 @@ import com.sakatoon.musicplayer.data.model.Song
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -22,6 +25,8 @@ class MusicRepository(
     private val context: Context
 ) {
     private val scanMutex = Mutex()
+    private val _folderSongCounts = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val folderSongCounts: StateFlow<Map<String, Int>> = _folderSongCounts.asStateFlow()
     val allSongs: Flow<List<Song>> = musicDao.getAllSongs()
     val allPlaylists: Flow<List<Playlist>> = musicDao.getAllPlaylists()
     val favoriteSongs: Flow<List<Song>> = musicDao.getFavoriteSongs()
@@ -34,6 +39,7 @@ class MusicRepository(
         android.util.Log.d("MusicRepository", "Iniciando escaneo optimizado de ${folderUris.size} carpetas")
         
         val allAudioFiles = mutableListOf<DocumentFile>()
+        val scannedCounts = mutableMapOf<String, Int>()
         for (uriString in folderUris) {
             try {
                 val folderUri = Uri.parse(uriString)
@@ -41,7 +47,10 @@ class MusicRepository(
                 if (documentFile == null || !documentFile.isDirectory || !documentFile.canRead()) {
                     throw java.io.IOException("Carpeta sin acceso")
                 }
-                collectAudioFilesRecursively(documentFile, allAudioFiles)
+                val folderAudioFiles = mutableListOf<DocumentFile>()
+                collectAudioFilesRecursively(documentFile, folderAudioFiles)
+                allAudioFiles.addAll(folderAudioFiles)
+                scannedCounts[uriString] = folderAudioFiles.size
             } catch (e: Exception) {
                 // Do not mistake revoked folder access for an empty library.
                 throw java.io.IOException("Vuelve a seleccionar las carpetas de música en Ajustes.", e)
@@ -86,6 +95,7 @@ class MusicRepository(
         }
 
         android.util.Log.d("MusicRepository", "Escaneo optimizado finalizado. Total: ${finalSongsList.size}")
+        _folderSongCounts.value = scannedCounts
         }
     }
 

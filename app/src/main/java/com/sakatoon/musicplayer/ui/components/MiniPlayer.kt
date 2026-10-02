@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.painterResource
+import com.sakatoon.musicplayer.R
 import com.sakatoon.musicplayer.data.model.Song
 
 @Composable
@@ -49,7 +51,15 @@ fun MiniPlayer(
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
             )
             Row(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp)) {
-                AsyncImage(model = song.albumArtUri, contentDescription = "Portada de ${song.title}", contentScale = ContentScale.Crop, modifier = Modifier.size(104.dp).background(Color.DarkGray), error = null, fallback = null)
+                AsyncImage(
+                    model = resolveArtworkModel(song.albumArtUri, R.drawable.sakatoon_mp),
+                    contentDescription = "Portada de ${song.title}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(104.dp).background(Color.DarkGray),
+                    placeholder = painterResource(R.drawable.sakatoon_mp),
+                    error = painterResource(R.drawable.sakatoon_mp),
+                    fallback = painterResource(R.drawable.sakatoon_mp)
+                )
                 Spacer(modifier = Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
                     Column {

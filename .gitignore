@@ -14,6 +14,7 @@
 .cxx
 local.properties
 .gradle-local/
+.gradle-user-home/
 .kotlin/
 .idea/
 **/build/
@@ -28,4 +29,5 @@ local.properties
 keystore.properties
 secrets.properties
 *.log
+hs_err_pid*.log
 verification-local/

@@ -4,11 +4,13 @@ Reproductor de música local para Android, desarrollado por **SakaToOn** con Kot
 
 ## Funciones
 
-- **Biblioteca local:** agrega varias carpetas con el selector de Android y explora también sus subcarpetas. Puedes quitar carpetas de la biblioteca o volver a escanearlas; estas acciones no borran tus archivos de música.
+- **Biblioteca local:** agrega varias carpetas con el selector de Android, explora también sus subcarpetas y muestra cuántas canciones encontró en cada carpeta. Puedes quitar carpetas de la biblioteca o volver a escanearlas; estas acciones no borran tus archivos de música.
 - **Detección de audio:** reconoce tipos MIME de audio y extensiones MP3, M4A, WAV, FLAC, OGG y AAC. La reproducción de un archivo concreto depende de sus códecs y del dispositivo.
-- **Metadatos y portadas:** obtiene título, artista, álbum, duración e imagen incrustada. Guarda metadatos en Room y las portadas extraídas en la caché del teléfono.
-- **Reproductor:** reproducir/pausar, canción anterior y siguiente, búsqueda de posición y tiempos de reproducción.
+- **Metadatos y portadas:** obtiene título, artista, álbum, duración e imagen incrustada. Guarda metadatos en Room y las portadas extraídas en la caché del teléfono; muestra una imagen de MusicPlayer cuando el archivo no tiene carátula o no puede cargarse.
+- **Reproductor:** reproducir/pausar, canción anterior y siguiente, reproducción aleatoria, búsqueda de posición y tiempos de reproducción.
 - **Mini reproductor ampliado:** portada, título, artista, progreso y controles grandes en Biblioteca y en el detalle de una lista.
+- **Tres widgets de inicio:** reproductor compacto, panel grande de Ahora suena con portada/progreso y accesos directos a Biblioteca, Favoritos y Listas.
+- **Ecualizador:** disponible dentro de Ajustes, con bandas adaptadas al dispositivo, activación independiente, perfiles Plano, Rock, Pop, Electrónica y Voz, y configuración persistente.
 - **Favoritos:** agrega y quita canciones; se conservan localmente.
 - **Listas de reproducción:** crear y eliminar listas, agregar canciones y retirarlas. Al elegir una canción, la cola actual se basa en la biblioteca completa, no sólo en la lista visible.
 - **Segundo plano:** sesión multimedia y notificación de reproducción mediante Media3; gestiona el foco de audio y pausa cuando se desconectan los audífonos. Cerrar la ventana del teléfono no detiene una reproducción activa.
@@ -101,7 +103,7 @@ app/src/androidTest/ Pruebas en dispositivo
 
 ## Límites actuales
 
-No incluye ecualizador, letras, reproducción aleatoria, repetición configurable, temporizador, streaming ni edición de etiquetas. Las listas personalizadas se gestionan en el teléfono y no se muestran como categorías del menú del coche. La música debe seguir accesible en las carpetas autorizadas; cambiar rutas o permisos requiere un nuevo escaneo. La recuperación de portadas eliminadas de la caché y la gestión de bibliotecas muy grandes requieren pruebas adicionales.
+No incluye letras, repetición configurable, temporizador, streaming ni edición de etiquetas. Las listas personalizadas se gestionan en el teléfono y no se muestran como categorías del menú del coche. La disponibilidad y cantidad de bandas del ecualizador dependen del motor de audio del dispositivo. La música debe seguir accesible en las carpetas autorizadas; cambiar rutas o permisos requiere un nuevo escaneo. La recuperación de portadas eliminadas de la caché y la gestión de bibliotecas muy grandes requieren pruebas adicionales.
 
 ## Desarrollo y contribuciones
 
