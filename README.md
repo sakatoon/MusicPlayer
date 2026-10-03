@@ -2,6 +2,16 @@
 
 Reproductor de música local para Android, desarrollado por **SakaToOn** con Kotlin, Jetpack Compose y Media3. Permite elegir carpetas, organizar canciones y acceder a la biblioteca desde Android Auto.
 
+## Vista de la interfaz
+
+Estas capturas fueron tomadas directamente de la aplicación instalada en un teléfono Android:
+
+| Biblioteca | Ajustes |
+| --- | --- |
+| ![Biblioteca de MusicPlayer](docs/screenshots/library.png) | ![Ajustes de MusicPlayer](docs/screenshots/settings.png) |
+
+La biblioteca muestra las carátulas, títulos, artistas, buscador y el mini reproductor ampliado. Ajustes incluye la gestión de carpetas, el contador de canciones, temas, ecualizador e información del desarrollador.
+
 ## Funciones
 
 - **Biblioteca local:** agrega varias carpetas con el selector de Android, explora también sus subcarpetas y muestra cuántas canciones encontró en cada carpeta. Puedes quitar carpetas de la biblioteca o volver a escanearlas; estas acciones no borran tus archivos de música.
