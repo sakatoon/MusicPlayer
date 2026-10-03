@@ -60,6 +60,7 @@ fun MusicNavHost(
             SettingsScreen(
                 viewModel = viewModel,
                 onEqualizerClick = { navController.navigate(Screen.Equalizer.route) },
+                onDeveloperClick = { navController.navigate(Screen.Developer.route) },
 
                 onFolderSelected = {
                     // Navigate back to Home/Library and clear stack up to Home to avoid back loops
@@ -68,6 +69,9 @@ fun MusicNavHost(
                     }
                 }
             )
+        }
+        composable(Screen.Developer.route) {
+            DeveloperScreen(onBack = { navController.popBackStack() })
         }
         composable(
             route = Screen.PlaylistDetail.route,

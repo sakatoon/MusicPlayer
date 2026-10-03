@@ -9,6 +9,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -24,9 +25,11 @@ class UserPreferencesRepositoryTest {
             assertFalse(firstRepository.shuffleEnabled.first())
 
             firstRepository.setShuffleEnabled(true)
+            firstRepository.setTheme("sunset")
 
             val restoredRepository = UserPreferencesRepository(dataStore)
             assertTrue(restoredRepository.shuffleEnabled.first())
+            assertEquals("sunset", restoredRepository.theme.first())
         } finally {
             scope.cancel()
             file.delete()

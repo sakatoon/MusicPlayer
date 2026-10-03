@@ -9,6 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 
 import androidx.compose.material3.Scaffold
@@ -50,7 +52,8 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            MusicPlayerTheme {
+            val uiState by viewModel.uiState.collectAsState()
+            MusicPlayerTheme(theme = uiState.theme) {
                 val windowSize = calculateWindowSizeClass(this)
                 MainScreen(
                     windowSize = windowSize.widthSizeClass,

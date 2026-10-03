@@ -35,6 +35,7 @@ import com.sakatoon.musicplayer.service.MediaIdResolver
 import com.sakatoon.musicplayer.widget.PlayButtonAction
 import com.sakatoon.musicplayer.widget.playButtonAction
 import com.sakatoon.musicplayer.widget.randomSongIndex
+import com.sakatoon.musicplayer.ui.theme.MusicTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +49,7 @@ data class MusicUiState(
     val currentSong: Song? = null,
     val isPlaying: Boolean = false,
     val isShuffleEnabled: Boolean = false,
+    val theme: MusicTheme = MusicTheme.DEFAULT,
     val progress: Float = 0f,
     val currentPosition: Long = 0L,
     val duration: Long = 0L,
@@ -98,6 +100,12 @@ class MusicViewModel(
             }
         }, MoreExecutors.directExecutor())
 
+
+        viewModelScope.launch {
+            userPreferencesRepository.theme.collectLatest { storedTheme ->
+                _uiState.value = _uiState.value.copy(theme = MusicTheme.fromStorage(storedTheme))
+            }
+        }
 
         viewModelScope.launch {
             userPreferencesRepository.shuffleEnabled.collectLatest { enabled ->
@@ -245,6 +253,11 @@ class MusicViewModel(
         viewModelScope.launch {
             userPreferencesRepository.setShuffleEnabled(enabled)
         }
+    }
+
+    fun setTheme(theme: MusicTheme) {
+        _uiState.value = _uiState.value.copy(theme = theme)
+        viewModelScope.launch { userPreferencesRepository.setTheme(theme.storageValue) }
     }
 
     fun addMusicFolder(uri: Uri) {

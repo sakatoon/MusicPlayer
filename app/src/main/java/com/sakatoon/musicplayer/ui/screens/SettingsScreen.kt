@@ -13,6 +13,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.FilterChip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,8 +37,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.layout.ContentScale
 import com.sakatoon.musicplayer.ui.viewmodel.MusicViewModel
+import com.sakatoon.musicplayer.ui.theme.MusicTheme
 
 
 @Composable
@@ -45,7 +50,8 @@ import com.sakatoon.musicplayer.ui.viewmodel.MusicViewModel
 fun SettingsScreen(
     viewModel: MusicViewModel,
     onEqualizerClick: () -> Unit,
-    onFolderSelected: () -> Unit
+    onFolderSelected: () -> Unit,
+    onDeveloperClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -227,6 +233,38 @@ fun SettingsScreen(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             shape = RoundedCornerShape(16.dp)
         ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Apariencia", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(
+                    "Elige una skin para personalizar los colores de MusicPlayer.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp
+                )
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(MusicTheme.values().toList()) { theme ->
+                        FilterChip(
+                            selected = uiState.theme == theme,
+                            onClick = { viewModel.setTheme(theme) },
+                            modifier = Modifier.heightIn(min = 48.dp),
+                            label = { Text(theme.displayName) },
+                            leadingIcon = {
+                                androidx.compose.foundation.layout.Box(
+                                    modifier = Modifier.size(18.dp).background(theme.accent, CircleShape)
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            shape = RoundedCornerShape(16.dp)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -251,7 +289,18 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        DeveloperInformation()
+        androidx.compose.material3.OutlinedButton(
+            onClick = onDeveloperClick,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                "Información del desarrollador",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
+        }
     }
 }
 
@@ -263,7 +312,7 @@ fun folderSongCountText(count: Int?, isScanning: Boolean): String = when {
 }
 
 @Composable
-private fun DeveloperInformation() {
+fun DeveloperInformation() {
     val context = LocalContext.current
     val developerEmail = "sakatoon@gmail.com"
 
